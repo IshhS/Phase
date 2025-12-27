@@ -51,6 +51,17 @@ const ideaSchema = new mongoose.Schema({
     step05Completed: { type: Boolean, default: false },
     step06Completed: { type: Boolean, default: false },
     step07Completed: { type: Boolean, default: false },
+    step08Completed: { type: Boolean, default: false },
+    testerData: {
+        testCases: [{
+            name: String,
+            description: String,
+            status: { type: String, enum: ['passed', 'failed', 'pending'], default: 'pending' },
+            result: String
+        }],
+        overallStatus: String,
+        testSummary: String
+    },
     createdAt: { type: Date, default: Date.now }
 });
 

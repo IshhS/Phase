@@ -113,6 +113,19 @@ function renderUI(app, user, ideaData, backFunction) {
             <h3 style="color: white;">Recommendations & Next Steps</h3>
             <div id="recommendations" style="color: white;"></div>
           </div>
+
+          <!-- Completion Button -->
+          <div style="text-align: center; margin-top: 3rem;">
+            <button id="complete-step-btn" class="cta-button" 
+              style="padding: 1.2rem 4rem; border-radius: 15px; font-weight: bold; font-size: 1.1rem; 
+              background: ${ideaData.step07Completed ? 'linear-gradient(135deg, #2ecc71, #27ae60)' : 'linear-gradient(135deg, #3498db, #2980b9)'}; 
+              box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+              cursor: ${ideaData.step07Completed ? 'default' : 'pointer'};"
+              ${ideaData.step07Completed ? 'disabled' : ''}>
+              ${ideaData.step07Completed ? '✓ STAGE 07 COMPLETED' : 'CONFIRM REVIEW & LOCK FINAL REPORT'}
+            </button>
+            <p style="margin-top: 1rem; color: rgba(255,255,255,0.5); font-size: 0.9rem;">${ideaData.step07Completed ? 'Stage 08 is now accessible from the dashboard.' : 'This will unlock Stage 08: Project Tester'}</p>
+          </div>
         </div>
       </section>
     </div>
@@ -148,6 +161,10 @@ function renderUI(app, user, ideaData, backFunction) {
   document.getElementById('switch-mission-btn').onclick = () => {
     localStorage.removeItem('phase_creation_mode');
     import('./load.js').then(m => m.initLoad(app, user));
+  };
+
+  document.getElementById('nav-logo').onclick = () => {
+    import('./home2.js').then(m => m.initHome2(app, user));
   };
 
   document.getElementById('back-btn').onclick = () => {
@@ -231,7 +248,41 @@ function renderUI(app, user, ideaData, backFunction) {
   const recommendationsDiv = document.getElementById('recommendations');
   recommendationsDiv.innerHTML = generateRecommendations(ideaData, completedWeeks, totalWeeks, completionRate, performanceGrade);
 
+  document.getElementById('complete-step-btn').onclick = async () => {
+    const btn = document.getElementById('complete-step-btn');
+    const originalText = btn.innerText;
+    btn.innerText = 'Locking...';
+    btn.disabled = true;
 
+    try {
+      const res = await fetch('/api/idea/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ step07Completed: true })
+      });
+
+      if (res.ok) {
+        btn.innerText = 'DONE';
+        btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+        setTimeout(() => {
+          alert('Stage 07: Final Review completed! Stage 08 is now unlocked.');
+          backFunction();
+        }, 500);
+      } else {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        alert('Failed to update stage status.');
+      }
+    } catch (err) {
+      console.error(err);
+      btn.innerText = originalText;
+      btn.disabled = false;
+      alert('Error saving stage status.');
+    }
+  };
 }
 
 function renderProgressGraph(ideaData) {

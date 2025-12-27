@@ -30,7 +30,7 @@ export async function initWeek(app, user) {
     app.innerHTML = `
         <div class="container" style="background: none; min-height: 100vh;">
             <nav class="navbar logged-in">
-                <div id="nav-logo" class="nav-logo">PHASE</div>
+                <div id="nav-logo" class="nav-logo" style="cursor: pointer;">PHASE</div>
                 <div class="nav-links">
                     <div id="user-profile" class="profile-container">
                         <div id="profile-icon" class="profile-icon"></div>
@@ -39,6 +39,7 @@ export async function initWeek(app, user) {
                             <p id="profile-email" class="profile-info-email"></p>
                             <p id="profile-team" class="profile-info-team"></p>
                             <hr class="profile-divider">
+                            <button id="switch-mission-btn" class="logout-btn" style="background: rgba(52, 152, 219, 0.2); color: #3498db; margin-bottom: 0.5rem; border: 1px solid rgba(52, 152, 219, 0.3);">SWITCH MISSION</button>
                             <button id="logout-btn" class="logout-btn">LOGOUT</button>
                         </div>
                     </div>
@@ -126,7 +127,17 @@ export async function initWeek(app, user) {
     document.getElementById('logout-btn').onclick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem('phase_creation_mode');
         window.location.reload();
+    };
+
+    document.getElementById('switch-mission-btn').onclick = () => {
+        localStorage.removeItem('phase_creation_mode');
+        import('./load.js').then(m => m.initLoad(app, user));
+    };
+
+    document.getElementById('nav-logo').onclick = () => {
+        import('./home2.js').then(m => m.initHome2(app, user));
     };
 
     document.getElementById('back-to-roadmap').onclick = (e) => {

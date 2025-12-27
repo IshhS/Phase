@@ -92,7 +92,7 @@ router.get('/me', authenticate, async (req, res) => {
 // Save or Update Idea
 router.post('/save', authenticate, async (req, res) => {
     try {
-        const { branch, skills, interests, constraints, isCompleted, idea, abstract, detailedDescription, step03Completed, step04Completed, step05Completed, step06Completed, step07Completed, teamName, leader, teammates } = req.body;
+        const { branch, skills, interests, constraints, isCompleted, idea, abstract, detailedDescription, step03Completed, step04Completed, step05Completed, step06Completed, step07Completed, step08Completed, teamName, leader, teammates } = req.body;
 
         const activeProject = await getActiveProject(req.userId);
         if (!activeProject) return res.status(400).json({ message: 'No active project found. Please initialize a project first.' });
@@ -117,6 +117,8 @@ router.post('/save', authenticate, async (req, res) => {
             if (step05Completed !== undefined) existingIdea.step05Completed = step05Completed;
             if (step06Completed !== undefined) existingIdea.step06Completed = step06Completed;
             if (step07Completed !== undefined) existingIdea.step07Completed = step07Completed;
+            if (step08Completed !== undefined) existingIdea.step08Completed = step08Completed;
+            if (req.body.testerData) existingIdea.testerData = req.body.testerData;
 
             await existingIdea.save();
             return res.json({ message: 'Idea updated', idea: existingIdea });
@@ -140,7 +142,9 @@ router.post('/save', authenticate, async (req, res) => {
             step04Completed: step04Completed || false,
             step05Completed: step05Completed || false,
             step06Completed: step06Completed || false,
-            step07Completed: step07Completed || false
+            step07Completed: step07Completed || false,
+            step08Completed: step08Completed || false,
+            testerData: req.body.testerData || { testCases: [], overallStatus: 'pending', testSummary: '' }
         });
 
         await newIdea.save();
@@ -610,6 +614,97 @@ router.post('/save-documentation', authenticate, async (req, res) => {
         await idea.save();
 
         res.json({ message: 'Documentation saved successfully', documentData: idea.documentData });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Save Tester Data
+router.post('/save-tester', authenticate, async (req, res) => {
+    try {
+        const { testerData } = req.body;
+
+        const activeProject = await getActiveProject(req.userId);
+        if (!activeProject) return res.status(404).json({ message: 'No active project found' });
+
+        const idea = await Idea.findOne({ user: req.userId, project: activeProject._id });
+        if (!idea) return res.status(404).json({ message: 'Idea not found' });
+
+        idea.testerData = testerData;
+        idea.step08Completed = true;
+        await idea.save();
+
+        res.json({ message: 'Tester data saved successfully', testerData: idea.testerData });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Generate AI Test Cases
+router.post('/generate-test-cases', authenticate, async (req, res) => {
+    try {
+        const activeProject = await getActiveProject(req.userId);
+        if (!activeProject) return res.status(404).json({ message: 'No active project found' });
+
+        const idea = await Idea.findOne({ user: req.userId, project: activeProject._id });
+        if (!idea) return res.status(404).json({ message: 'Idea not found' });
+
+        // Extract project title
+        const ideaText = idea.idea || "";
+        let projectTitle = "Untitled Project";
+        if (ideaText.includes('PROPOSED PROJECT TITLE:')) {
+            projectTitle = ideaText.split('PROPOSED PROJECT TITLE:')[1].split('\n')[0].trim();
+        } else if (ideaText.includes('Project:')) {
+            projectTitle = ideaText.split('Project:')[1].trim();
+        }
+
+        const testPrompt = `You are a Senior QA Engineer specializing in technical project validation. Generate 5 critical, high-impact test cases for the following engineering project:
+        
+PROJECT TITLE: ${projectTitle}
+CORE IDEA: ${idea.idea}
+DETAILED DESCRIPTION: ${idea.detailedDescription}
+
+For each test case, ensure it focuses on core functionality, user experience, or system reliability specific to this project's domain.
+
+Each test case MUST have:
+1. A professional NAME (concise and descriptive)
+2. Detailed STEPS (clear, numbered instructions)
+3. A specific expected RESULT (what success looks like)
+
+Format your response EXACTLY like this:
+TEST 1
+NAME: [name]
+STEPS: [steps]
+RESULT: [expected result]
+
+TEST 2
+NAME: [name]
+STEPS: [steps]
+RESULT: [expected result]
+
+Continue for all 5 tests.`;
+
+        const aiResponse = await chatWithArchitect([{ role: 'user', content: testPrompt }]);
+
+        const testCases = [];
+        const blocks = aiResponse.split(/TEST \d+/).filter(b => b.trim());
+
+        blocks.forEach(block => {
+            const nameMatch = block.match(/NAME:\s*(.+)/i);
+            const stepsMatch = block.match(/STEPS:\s*([\s\S]+?)(?=RESULT:|$)/i);
+            const resultMatch = block.match(/RESULT:\s*(.+)/i);
+
+            if (nameMatch && stepsMatch && resultMatch) {
+                testCases.push({
+                    name: nameMatch[1].trim(),
+                    description: stepsMatch[1].trim(),
+                    status: 'pending',
+                    result: resultMatch[1].trim()
+                });
+            }
+        });
+
+        res.json({ testCases });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -18,12 +18,15 @@ export async function initInitial(app, user) {
     app.innerHTML = `
       <div class="container">
         <nav class="navbar logged-in">
-          <div id="nav-logo" class="nav-logo">PHASE</div>
+          <div id="nav-logo" class="nav-logo" style="cursor: pointer;">PHASE</div>
           <div class="nav-links">
             <div id="user-profile" class="profile-container">
               <div id="profile-icon" class="profile-icon"></div>
               <div id="profile-dropdown" class="profile-dropdown glass">
                 <p id="profile-name" class="profile-info-name"></p>
+                <p id="profile-email" class="profile-info-email"></p>
+                <p id="profile-team" class="profile-info-team"></p>
+                <hr class="profile-divider">
                 <button id="switch-mission-btn" class="logout-btn" style="background: rgba(52, 152, 219, 0.2); color: #3498db; margin-bottom: 0.5rem; border: 1px solid rgba(52, 152, 219, 0.3);">SWITCH MISSION</button>
                 <button id="logout-btn" class="logout-btn">LOGOUT</button>
               </div>
@@ -219,9 +222,14 @@ export async function initInitial(app, user) {
     const profileIcon = document.getElementById('profile-icon');
     const profileDropdown = document.getElementById('profile-dropdown');
     const profileName = document.getElementById('profile-name');
-    const initials = user.username.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    const profileEmail = document.getElementById('profile-email');
+    const profileTeam = document.getElementById('profile-team');
+
+    const initials = (user.username || 'U').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     profileIcon.innerText = initials;
     profileName.innerText = user.username;
+    profileEmail.innerText = user.email;
+    profileTeam.innerText = `Team: ${user.teamName || 'N/A'}`;
 
     profileIcon.onclick = (e) => {
       e.stopPropagation();
@@ -240,6 +248,10 @@ export async function initInitial(app, user) {
     document.getElementById('switch-mission-btn').onclick = () => {
       localStorage.removeItem('phase_creation_mode');
       import('./load.js').then(m => m.initLoad(app, user));
+    };
+
+    document.getElementById('nav-logo').onclick = () => {
+      import('./home2.js').then(m => m.initHome2(app, user));
     };
 
     document.getElementById('back-to-roadmap').onclick = () => {

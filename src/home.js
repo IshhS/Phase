@@ -253,30 +253,34 @@ export function initHome(app) {
     signupModal.classList.remove('active');
   };
 
-  const updateAuthState = async () => {
+  async function updateAuthState() {
     const token = localStorage.getItem('token');
+    const loginLink = document.getElementById('login-link');
+    const signupLink = document.getElementById('signup-link');
+    const homeLink = document.getElementById('home-link');
+    const aboutLink = document.getElementById('about-link');
+    const navLogo = document.getElementById('nav-logo');
+    const userProfile = document.getElementById('user-profile');
     const navLinks = document.querySelector('.nav-links');
     const navbar = document.querySelector('.navbar');
 
     if (token) {
       try {
-        // Fetch fresh details from User.js (the database)
         const response = await fetch('/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
           const user = await response.json();
-          // If logged in, automatically move to load selection or dashboard
-          const projRes = await fetch('/api/project/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const activeProj = projRes.ok ? await projRes.json() : null;
-          if (activeProj) {
-            initHome2(app, user);
-          } else {
-            initLoad(app, user);
-          }
+          loginLink.style.display = 'none';
+          signupLink.style.display = 'none';
+          homeLink.style.display = 'none';
+          aboutLink.style.display = 'none';
+          navLogo.style.display = 'block';
+          userProfile.style.display = 'flex';
+          navLinks.classList.add('is-logged-in');
+          navbar.classList.add('logged-in');
+          updateProfileDisplay(user);
           return;
         }
       } catch (err) {
@@ -284,7 +288,7 @@ export function initHome(app) {
       }
     }
 
-    // Default logged out state - always show login/signup on home page
+    // Default logged out state
     loginLink.style.display = 'inline-block';
     signupLink.style.display = 'inline-block';
     homeLink.style.display = 'inline-block';
@@ -293,7 +297,7 @@ export function initHome(app) {
     userProfile.style.display = 'none';
     navLinks.classList.remove('is-logged-in');
     navbar.classList.remove('logged-in');
-  };
+  }
 
   // Profile Dropdown Toggle
   profileIcon.addEventListener('click', (e) => {
@@ -431,16 +435,15 @@ export function initHome(app) {
   document.getElementById('get-started-btn').addEventListener('click', async () => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Already logged in, go to dashboard
       try {
         const response = await fetch('/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
           const user = await response.json();
-          await initLoad(app, user);
+          // After login or verification on landing page, always go to Mission Selection
+          initLoad(app, user);
         } else {
-          // Token invalid, show login
           openLogin();
         }
       } catch (err) {

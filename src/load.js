@@ -119,6 +119,11 @@ export async function initLoad(app, user) {
                 <button id="btn-load-project" class="btn btn-secondary" disabled>
                     Load Project
                 </button>
+
+                <div class="or-divider">OR</div>
+                <button id="btn-logout" class="btn btn-secondary" style="border: 1px solid rgba(231, 76, 60, 0.3); color: #e74c3c;">
+                    Logout
+                </button>
             </div>
         </div>
     `;
@@ -127,6 +132,14 @@ export async function initLoad(app, user) {
     const select = document.getElementById('project-select');
     const loadBtn = document.getElementById('btn-load-project');
     const newBtn = document.getElementById('btn-new-project');
+    const logoutBtn = document.getElementById('btn-logout');
+
+    logoutBtn.onclick = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('phase_creation_mode');
+        window.location.reload();
+    };
 
     select.onchange = () => {
         loadBtn.disabled = !select.value;

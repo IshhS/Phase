@@ -10,74 +10,48 @@ const token = localStorage.getItem('token');
 const initApp = async () => {
   if (token) {
     try {
-      // Validate token and get user data
       const response = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
         const user = await response.json();
-        console.log('Session restored for:', user.username);
-        // Check for active project to decide where to go
-        try {
-          const projRes = await fetch('/api/project/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const activeProj = projRes.ok ? await projRes.json() : null;
+        // Check for active project
+        const projRes = await fetch('/api/project/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const activeProj = projRes.ok ? await projRes.json() : null;
 
-          if (activeProj) {
-            // Active project exists (e.g. refresh on home2), go to dashboard
-            localStorage.removeItem('phase_creation_mode');
-            await initHome2(app, user);
-          } else if (localStorage.getItem('phase_creation_mode') === 'true') {
-            // User was in middle of creating new project, land on tunnel first
-            await initHome2(app, user);
-          } else {
-            // No active project (e.g. first load or manual new), go to selection
-            await initLoad(app, user);
-          }
-        } catch (e) {
-          console.error("Project check failed", e);
-          await initLoad(app, user);
+        if (activeProj && activeProj._id) {
+          initHome2(app, user);
+        } else {
+          initLoad(app, user);
         }
       } else {
-        // Token invalid or expired
-        console.warn('Session expired or invalid');
         localStorage.removeItem('token');
         initHome(app);
       }
     } catch (err) {
       console.error('Session check failed:', err);
-      // On network error or other issues, fall back to home but maybe keep token? 
-      // Safer to just show home for now if we can't verify.
       initHome(app);
     }
   } else {
-    // No token, show landing page
     initHome(app);
   }
 };
 
 initApp();
 
-// Listen for a custom event from home.js login
+// Global handler for login success
 document.addEventListener('userLoggedIn', async (e) => {
-  // If we pass user data in the event, use it, otherwise fetch
   const user = e.detail?.user;
-  if (user) {
+  const token = localStorage.getItem('token');
+
+  if (user && token) {
+    // After login, we always go to Mission Selection
     initLoad(app, user);
   } else {
-    // Fallback fetch if event didn't carry user data
-    const token = localStorage.getItem('token');
-    if (token) {
-      const response = await fetch('/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const user = await response.json();
-        initLoad(app, user);
-      }
-    }
+    window.location.reload(); // Fallback
   }
 });
 

@@ -5,6 +5,7 @@ import { initRoadmap } from './roadmap.js';
 import { initWeek } from './week.js';
 import { initSync } from './sync.js';
 import { initFinal } from './final.js';
+import { initTester } from './tester.js';
 
 export async function initHome2(app, user) {
   const token = localStorage.getItem('token');
@@ -15,6 +16,7 @@ export async function initHome2(app, user) {
   let step05Completed = false;
   let step06Completed = false;
   let step07Completed = false;
+  let step08Completed = false;
 
   try {
     const [projRes, ideaRes] = await Promise.all([
@@ -35,17 +37,24 @@ export async function initHome2(app, user) {
         step05Completed = idea.step05Completed;
         step06Completed = idea.step06Completed;
         step07Completed = idea.step07Completed;
+        step08Completed = idea.step08Completed;
       }
     }
   } catch (err) {
     console.error("Failed to check roadmap status", err);
   }
+  const allCompleted = step01Completed && step02Completed && step03Completed && step04Completed && step05Completed && step06Completed && step07Completed && step08Completed;
 
   app.innerHTML = `
     <div class="container" style="background: none; min-height: 100vh;">
       <nav class="navbar logged-in">
         <div id="nav-logo" class="nav-logo">PHASE</div>
-        <div class="nav-links">
+        <div class="nav-links" style="display: flex; align-items: center; gap: 1rem;">
+          ${allCompleted ? `
+            <div class="status-badge" style="background: linear-gradient(135deg, #f1c40f, #d35400); color: white; padding: 0.5rem 1.2rem; border-radius: 20px; font-weight: 900; font-size: 0.8rem; letter-spacing: 1px; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4); border: 1px solid rgba(255,255,255,0.2);">
+              MISSION ACCOMPLISHED 🏆
+            </div>
+          ` : ''}
           <div id="user-profile" class="profile-container">
             <div id="profile-icon" class="profile-icon"></div>
             <div id="profile-dropdown" class="profile-dropdown glass">
@@ -63,7 +72,7 @@ export async function initHome2(app, user) {
       <!-- Steps Section -->
       <section class="content-section" id="steps" style="padding: 60px 0 100px 0; background: transparent;">
         <div class="steps-wrapper glass" style="background: rgba(0, 0, 0, 0.85); margin: 0 4rem 4rem 4rem; padding: 4rem; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); position: relative;">
-          <h2 class="section-title" style="margin-top: 0; text-align: center; margin-bottom: 4rem;">THE 7-STEP TUNNEL</h2>
+          <h2 class="section-title" style="margin-top: 0; text-align: center; margin-bottom: 4rem;">THE 8-STEP TUNNEL</h2>
           
           <div class="steps-grid">
              <div class="step-card ${step01Completed ? 'completed' : ''}" id="step-01" style="cursor: pointer;">
@@ -84,29 +93,35 @@ export async function initHome2(app, user) {
                 <div class="step-desc">Similarity check and scope lock-in procedure.</div>
              </div>
 
-             <div class="step-card ${step04Completed ? 'completed' : ''}" id="step-04" style="cursor: pointer;">
+             <div class="step-card ${step04Completed ? 'completed' : ''}" id="step-04" style="grid-column: 4 / 5; cursor: pointer;">
                 <div class="step-number">04</div>
                 <div class="step-title">Roadmap</div>
                 <div class="step-desc">Guided project module activation phase.</div>
              </div>
 
              <!-- Row 2 -->
-             <div class="step-card ${step05Completed ? 'completed' : ''}" id="step-05" style="grid-column: 1 / 2; cursor: pointer;">
+             <div class="step-card ${step05Completed ? 'completed' : ''}" id="step-05" style="grid-column: 1 / 2; cursor: pointer; margin-top: 2rem;">
                 <div class="step-number">05</div>
                 <div class="step-title">Execution</div>
                 <div class="step-desc">Learn, Apply, Submit loop implementation.</div>
              </div>
 
-             <div class="step-card ${step06Completed ? 'completed' : ''}" id="step-06" style="grid-column: 2 / 3; cursor: pointer;">
+             <div class="step-card ${step06Completed ? 'completed' : ''}" id="step-06" style="grid-column: 2 / 3; cursor: pointer; margin-top: 2rem;">
                 <div class="step-number">06</div>
                 <div class="step-title">Documentation</div>
                 <div class="step-desc">Generate comprehensive project documentation.</div>
              </div>
 
-             <div class="step-card ${step07Completed ? 'completed' : ''}" id="step-07" style="grid-column: 3 / 4; cursor: pointer;">
+             <div class="step-card ${step07Completed ? 'completed' : ''}" id="step-07" style="grid-column: 3 / 4; cursor: pointer; margin-top: 2rem;">
                 <div class="step-number">07</div>
                 <div class="step-title">Final Report</div>
                 <div class="step-desc">Complete 10-page academic document.</div>
+             </div>
+
+             <div class="step-card ${step08Completed ? 'completed' : ''}" id="step-08" style="grid-column: 4 / 5; cursor: pointer; margin-top: 2rem;">
+                <div class="step-number">08</div>
+                <div class="step-title">Project Tester</div>
+                <div class="step-desc">Validate project through quality assurance.</div>
              </div>
           </div>
         </div>
@@ -151,7 +166,15 @@ export async function initHome2(app, user) {
     if (step01Completed && step02Completed && step03Completed && step04Completed && step05Completed && step06Completed) {
       initFinal(app, user, () => initHome2(app, user));
     } else {
-      alert('All 6 stages must be completed to access Final Report.');
+      alert('All 6 previous stages must be completed to access Final Report.');
+    }
+  };
+
+  document.getElementById('step-08').onclick = () => {
+    if (step01Completed && step02Completed && step03Completed && step04Completed && step05Completed && step06Completed && step07Completed) {
+      initTester(app, user, () => initHome2(app, user));
+    } else {
+      alert('All 7 previous stages must be completed to access Project Tester.');
     }
   };
   document.getElementById('logout-btn').onclick = () => {
