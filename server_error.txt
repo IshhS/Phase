@@ -1,0 +1,16 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ΓÜÖ∩╕Å  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ≡ƒùé∩╕Å backup and recover secrets: https://dotenvx.com/ops
+MongoDB Connected.
+Server running on port 5000
+[Phase Routes] Initialization Request Body: {
+  mode: 'Solo',
+  isLeader: false,
+  teamName: '',
+  teamSize: '',
+  teamEmails: [],
+  branch: 'CS',
+  year: 'F.E',
+  projectType: 'Mini'
+}
+[Phase Mailer] Sending to: 23104138@apsit.edu.in using undefined
+[Phase Mailer] FAILED for 23104138@apsit.edu.in: Missing credentials for "PLAIN"

@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "groq-sdk": "^0.37.0",
+    "nodemailer": "^7.0.12"
+  }
+}

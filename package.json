@@ -1,0 +1,38 @@
+{
+  "name": "phase",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "nodemon server/index.js",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11",
+    "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "animejs": "^4.2.2",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "docx": "^9.5.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "file-saver": "^2.0.5",
+    "groq-sdk": "^0.37.0",
+    "html-docx-js": "^0.3.1",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.12.1",
+    "jsonwebtoken": "^9.0.3",
+    "jspdf": "^3.0.4",
+    "mongoose": "^9.0.2",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.12",
+    "three": "^0.182.0"
+  }
+}
