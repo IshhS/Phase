@@ -24,6 +24,7 @@ export async function initInitial(app, user) {
               <div id="profile-icon" class="profile-icon"></div>
               <div id="profile-dropdown" class="profile-dropdown glass">
                 <p id="profile-name" class="profile-info-name"></p>
+                <button id="switch-mission-btn" class="logout-btn" style="background: rgba(52, 152, 219, 0.2); color: #3498db; margin-bottom: 0.5rem; border: 1px solid rgba(52, 152, 219, 0.3);">SWITCH MISSION</button>
                 <button id="logout-btn" class="logout-btn">LOGOUT</button>
               </div>
             </div>
@@ -201,6 +202,7 @@ export async function initInitial(app, user) {
         });
 
         if (response.ok) {
+          localStorage.removeItem('phase_creation_mode');
           const result = await response.json();
           renderForm(result.project); // Re-render with green state
           alert('Configuration Secured.');
@@ -231,10 +233,18 @@ export async function initInitial(app, user) {
     document.getElementById('logout-btn').onclick = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('phase_creation_mode');
       window.location.reload();
     };
 
-    document.getElementById('back-to-roadmap').onclick = () => window.location.reload();
+    document.getElementById('switch-mission-btn').onclick = () => {
+      localStorage.removeItem('phase_creation_mode');
+      import('./load.js').then(m => m.initLoad(app, user));
+    };
+
+    document.getElementById('back-to-roadmap').onclick = () => {
+      import('./home2.js').then(m => m.initHome2(app, user));
+    };
   };
 
   renderForm(existingProject);

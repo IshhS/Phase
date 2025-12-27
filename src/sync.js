@@ -474,7 +474,9 @@ export async function initSync(app, user) {
         });
 
         sendBtn.onclick = sendChatMessage;
-        document.getElementById('btn-exit').onclick = () => window.location.reload();
+        document.getElementById('btn-exit').onclick = () => {
+            import('./home2.js').then(m => m.initHome2(app, user));
+        };
 
         // Start Conversation
         appendBotMessage(`Hello! I am your Documentation Assistant. I see you are working on <strong>${state.projectData.projectTitle}</strong>.`);
@@ -672,7 +674,7 @@ export async function initSync(app, user) {
 
                 if (res.ok) {
                     alert('Stage 6 Completed! Redirecting to Dashboard...');
-                    window.location.reload();
+                    import('./home2.js').then(m => m.initHome2(app, user));
                 } else {
                     throw new Error('Save failed');
                 }

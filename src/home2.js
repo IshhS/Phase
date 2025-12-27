@@ -53,6 +53,7 @@ export async function initHome2(app, user) {
               <p id="profile-email" class="profile-info-email"></p>
               <p id="profile-team" class="profile-info-team"></p>
               <hr class="profile-divider">
+              <button id="switch-mission-btn" class="logout-btn" style="background: rgba(52, 152, 219, 0.2); color: #3498db; margin-bottom: 0.5rem; border: 1px solid rgba(52, 152, 219, 0.3);">SWITCH MISSION</button>
               <button id="logout-btn" class="logout-btn">LOGOUT</button>
             </div>
           </div>
@@ -156,7 +157,13 @@ export async function initHome2(app, user) {
   document.getElementById('logout-btn').onclick = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('phase_creation_mode');
     window.location.reload();
+  };
+
+  document.getElementById('switch-mission-btn').onclick = () => {
+    localStorage.removeItem('phase_creation_mode');
+    import('./load.js').then(m => m.initLoad(app, user));
   };
 }
 

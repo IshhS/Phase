@@ -20,6 +20,7 @@ export function initHome(app) {
               <p id="profile-email" class="profile-info-email"></p>
               <p id="profile-team" class="profile-info-team"></p>
               <hr class="profile-divider">
+              <button id="switch-mission-btn" class="logout-btn" style="background: rgba(52, 152, 219, 0.2); color: #3498db; margin-bottom: 0.5rem; border: 1px solid rgba(52, 152, 219, 0.3);">SWITCH MISSION</button>
               <button id="logout-btn" class="logout-btn">LOGOUT</button>
             </div>
           </div>
@@ -266,12 +267,16 @@ export function initHome(app) {
 
         if (response.ok) {
           const user = await response.json();
-          // Update profile display but stay on home page
-          updateProfileDisplay(user);
-          // Auto-redirect to load selection if on home page and logged in? 
-          // User request says "when user login load.js page should open".
-          // If we are just verifying auth state (e.g. page refresh), we might not want to force redirect if they are already on home.
-          // But main.js handles the initial load. home.js handles the landing page.
+          // If logged in, automatically move to load selection or dashboard
+          const projRes = await fetch('/api/project/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const activeProj = projRes.ok ? await projRes.json() : null;
+          if (activeProj) {
+            initHome2(app, user);
+          } else {
+            initLoad(app, user);
+          }
           return;
         }
       } catch (err) {
@@ -304,8 +309,14 @@ export function initHome(app) {
   document.getElementById('logout-btn').addEventListener('click', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('phase_creation_mode');
     updateAuthState();
     window.location.reload(); // Refresh to clean state
+  });
+
+  document.getElementById('switch-mission-btn').addEventListener('click', () => {
+    localStorage.removeItem('phase_creation_mode');
+    initLoad(app, JSON.parse(localStorage.getItem('user') || '{}'));
   });
 
   // Modal Elements

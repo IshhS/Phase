@@ -24,7 +24,10 @@ export async function initRoadmap(app, user) {
                 <button id="back-to-roadmap" class="submit-btn" style="margin-top: 2rem; width: auto; padding: 1rem 3rem;">RETURN TO TUNNEL</button>
             </div>
         `;
-        document.getElementById('back-to-roadmap').onclick = () => window.location.reload();
+        document.getElementById('back-to-roadmap').onclick = () => {
+            import('./home2.js').then(m => m.initHome2(app, user));
+        };
+        return;
         return;
     }
 
@@ -133,7 +136,7 @@ export async function initRoadmap(app, user) {
 
     document.getElementById('back-to-roadmap-link').onclick = (e) => {
         e.preventDefault();
-        window.location.reload();
+        import('./home2.js').then(m => m.initHome2(app, user));
     };
 
     if (!roadmapGenerated) {

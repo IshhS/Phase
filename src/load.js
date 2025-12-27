@@ -144,6 +144,12 @@ export async function initLoad(app, user) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ projectId })
             });
+
+            if (projectId === 'new') {
+                localStorage.setItem('phase_creation_mode', 'true');
+            } else {
+                localStorage.removeItem('phase_creation_mode');
+            }
             initHome2(app, user);
         } catch (e) {
             console.error('Error setting active project', e);

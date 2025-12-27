@@ -131,7 +131,7 @@ export async function initWeek(app, user) {
 
     document.getElementById('back-to-roadmap').onclick = (e) => {
         e.preventDefault();
-        window.location.reload();
+        import('./home2.js').then(m => m.initHome2(app, user));
     };
 
     // Week Card Click Handlers

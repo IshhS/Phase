@@ -85,7 +85,8 @@ router.post('/set-active', authenticate, async (req, res) => {
 router.post('/initialize', authenticate, async (req, res) => {
     try {
         console.log('[Phase Routes] Initialization Request Body:', req.body);
-        let project = await Project.findOne({ user: req.userId });
+        // Find the LATEST ACTIVE project to update, or create new if none active
+        let project = await Project.findOne({ user: req.userId, isActive: true });
         const leader = await User.findById(req.userId);
 
         if (!leader) {
@@ -96,11 +97,10 @@ router.post('/initialize', authenticate, async (req, res) => {
         const { teamEmails, teamName, mode } = req.body;
 
         if (project) {
-            // Find new emails that weren't in the project before
+            // Update existing active project
             const existingEmails = project.teamEmails || [];
-            const newEmails = teamEmails.filter(email => !existingEmails.includes(email));
+            const newEmails = Array.isArray(teamEmails) ? teamEmails.filter(email => !existingEmails.includes(email)) : [];
 
-            // Update existing
             Object.assign(project, req.body);
             await project.save();
 

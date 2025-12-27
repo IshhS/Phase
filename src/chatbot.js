@@ -333,6 +333,8 @@ export async function initChatbot(app, user) {
 
     sendBtn.onclick = handleChat;
 
-    exitBtn.onclick = () => window.location.reload();
+    exitBtn.onclick = () => {
+        import('./home2.js').then(m => m.initHome2(app, user));
+    };
 }
 

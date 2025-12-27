@@ -27,6 +27,10 @@ const initApp = async () => {
 
           if (activeProj) {
             // Active project exists (e.g. refresh on home2), go to dashboard
+            localStorage.removeItem('phase_creation_mode');
+            await initHome2(app, user);
+          } else if (localStorage.getItem('phase_creation_mode') === 'true') {
+            // User was in middle of creating new project, land on tunnel first
             await initHome2(app, user);
           } else {
             // No active project (e.g. first load or manual new), go to selection
