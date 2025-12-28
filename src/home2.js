@@ -111,18 +111,20 @@ export async function initHome2(app, user) {
                 <div class="step-title">Documentation</div>
                 <div class="step-desc">Generate comprehensive project documentation.</div>
              </div>
-
+             
              <div class="step-card ${step07Completed ? 'completed' : ''}" id="step-07" style="grid-column: 3 / 4; cursor: pointer; margin-top: 2rem;">
                 <div class="step-number">07</div>
+                <div class="step-title">Project Tester</div>
+                <div class="step-desc">Validate project through quality assurance.</div>
+             </div>
+             
+             <div class="step-card ${step08Completed ? 'completed' : ''}" id="step-08" style="grid-column: 4 / 5; cursor: pointer; margin-top: 2rem;">
+                <div class="step-number">08</div>
                 <div class="step-title">Final Report</div>
                 <div class="step-desc">Complete 10-page academic document.</div>
              </div>
 
-             <div class="step-card ${step08Completed ? 'completed' : ''}" id="step-08" style="grid-column: 4 / 5; cursor: pointer; margin-top: 2rem;">
-                <div class="step-number">08</div>
-                <div class="step-title">Project Tester</div>
-                <div class="step-desc">Validate project through quality assurance.</div>
-             </div>
+  
           </div>
         </div>
       </section>

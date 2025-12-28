@@ -145,7 +145,7 @@ export function initHome(app) {
 
       <!-- Steps Section -->
       <section class="content-section" id="steps">
-        <h2 class="section-title">THE 7-STEP TUNNEL</h2>
+        <h2 class="section-title">THE 8-STEP TUNNEL</h2>
         <div class="steps-grid">
            <div class="step-card">
               <div class="step-number">01</div>
@@ -179,6 +179,11 @@ export function initHome(app) {
            </div>
            <div class="step-card">
               <div class="step-number">07</div>
+              <div class="step-title">Project Tester</div>
+              <div class="step-desc">Validate project through quality assurance.</div>
+           </div>
+           <div class="step-card">
+              <div class="step-number">08</div>
               <div class="step-title">Final Report</div>
               <div class="step-desc">Final review and success confidence.</div>
            </div>
@@ -361,7 +366,7 @@ export function initHome(app) {
     if (e.target === overlay) closeAll();
   });
 
-  // Example Form Handling (Client-side)
+  // Example Form Handling (Client-side)z
   document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const username = document.getElementById('signup-name').value;
